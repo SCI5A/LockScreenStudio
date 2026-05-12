@@ -3,20 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>LockScreen Studio Engine - Live Edition</title>
+  <title>LockScreen Studio - Cinematic Stacked Edition</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800&family=Almarai:wght@300;400;700&family=Tajawal:wght@200;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --glass: rgba(255, 255, 255, 0.94);
+      --glass: rgba(255, 255, 255, 0.92);
       --textShadow: 0px 2px 15px rgba(0, 0, 0, 0.5);
       --mainColor: #ffffff;
       --accent: #007AFF;
-      --bgBlur: 0px;
-      --bgBrightness: 0.8;
+      --notifRadius: 24px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,10 +26,8 @@
       font-family: 'Cairo', sans-serif;
       background: #000;
       color: var(--mainColor);
-      transition: color 0.5s ease, font-family 0.3s ease;
     }
 
-    /* Background Engine */
     .bg-container { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
     .bg-media {
       position: absolute;
@@ -38,42 +35,8 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(var(--bgBrightness)) blur(var(--bgBlur));
-      transition: filter 0.3s ease;
+      filter: brightness(0.8);
     }
-
-    /* Dynamic Island */
-    .dynamic-island-container {
-      position: absolute;
-      top: 11px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 100;
-      width: 100%;
-      pointer-events: none;
-      display: flex;
-      justify-content: center;
-    }
-
-    .dynamic-island {
-      width: 120px;
-      height: 35px;
-      background: #000;
-      border-radius: 20px;
-      transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 12px;
-      overflow: hidden;
-      padding: 0 15px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .dynamic-island.expanded { width: 300px; height: 45px; }
-    .island-content { opacity: 0; white-space: nowrap; transition: opacity 0.3s; display: flex; align-items: center; gap: 10px; }
-    .dynamic-island.expanded .island-content { opacity: 1; }
 
     /* Content */
     .content {
@@ -95,18 +58,47 @@
       letter-spacing: -2px;
     }
 
-    .widgets-row { display: flex; gap: 15px; margin-top: 10px; text-shadow: var(--textShadow); }
-    .widget-item { display: flex; flex-direction: column; align-items: center; font-size: 14px; font-weight: 600; }
-    .widget-icon { font-size: 20px; margin-bottom: 2px; }
-
     .date-container { margin-top: 10px; text-shadow: var(--textShadow); }
     .date { font-size: 28px; font-weight: 600; }
     .hijri { font-size: 24px; font-weight: 500; margin-top: 2px; }
 
+    /* Music Widget - Cinematic Stacked */
+    .music-widget {
+      margin-top: 25px;
+      width: 92%;
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 28px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      display: none; /* Hidden by default */
+    }
+
+    .music-widget.active { display: flex; }
+
+    .music-top { display: flex; align-items: center; gap: 15px; }
+    .music-art { width: 55px; height: 55px; border-radius: 12px; background: #333; background-size: cover; }
+    .music-info { flex: 1; text-align: right; }
+    .music-title { font-size: 17px; font-weight: 700; }
+    .music-artist { font-size: 14px; opacity: 0.7; }
+
+    .music-progress-container { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: relative; }
+    .music-progress-bar { height: 100%; background: #fff; border-radius: 2px; width: 35%; transition: width 1s linear; }
+
+    .music-controls { display: flex; justify-content: center; gap: 30px; font-size: 22px; }
+
+    /* Notifications Area - Stacked Logic */
     .notifications-area {
       width: 94%;
       max-width: 500px;
-      margin-top: 30px;
+      margin-top: 25px;
+      position: relative;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -114,12 +106,24 @@
 
     .notification-box {
       background: var(--glass);
-      border-radius: 24px;
+      border-radius: var(--notifRadius);
       padding: 12px 18px;
       color: #000;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      animation: notifIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: bottom;
     }
+
+    /* Stacked Effect */
+    .notification-box:not(:first-child) {
+      margin-top: -45px;
+      transform: scale(0.95);
+      opacity: 0.7;
+      filter: blur(1px);
+      z-index: -1;
+    }
+
+    .notification-box:nth-child(3) { transform: scale(0.9) translateY(10px); opacity: 0.4; z-index: -2; }
 
     .notif-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .notif-right { display: flex; align-items: center; gap: 6px; }
@@ -127,40 +131,28 @@
     .notif-label { font-size: 17px; font-weight: 700; }
     .notif-arrow { color: #ff3b30; font-size: 17px; }
     .notif-time { font-size: 17px; font-weight: 600; }
-    .notif-more { width: 22px; height: 22px; background: #e5e5ea; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #8e8e93; }
     .notif-body { font-size: 21px; font-weight: 600; text-align: center; padding: 2px 0 8px 0; }
 
-    @keyframes notifIn { from { transform: translateY(-30px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-
-    /* Advanced Control Panel */
+    /* Control Panel */
     .panel {
       position: fixed;
       bottom: 20px;
       left: 20px;
-      width: 360px;
-      background: rgba(0, 0, 0, 0.94);
-      backdrop-filter: blur(25px);
-      border-radius: 28px;
+      width: 350px;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
       padding: 20px;
       z-index: 1000;
       border: 1px solid rgba(255,255,255,0.1);
       color: #fff;
       max-height: 85vh;
       overflow-y: auto;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
     }
 
     .panel.hidden { display: none; }
-    .panel h2 { font-size: 20px; margin-bottom: 15px; color: var(--accent); text-align: center; font-weight: 800; }
-    
-    .panel-section {
-      background: rgba(255,255,255,0.05);
-      border-radius: 15px;
-      padding: 12px;
-      margin-bottom: 15px;
-    }
-
-    .panel label { display: block; font-size: 11px; opacity: 0.6; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .panel h2 { font-size: 18px; margin-bottom: 15px; color: var(--accent); text-align: center; }
+    .panel label { display: block; font-size: 11px; opacity: 0.7; margin-top: 10px; }
     .panel input, .panel textarea, .panel select {
       width: 100%;
       background: rgba(255,255,255,0.1);
@@ -169,49 +161,32 @@
       padding: 10px;
       color: #fff;
       margin-top: 5px;
-      font-family: inherit;
     }
-
-    .panel .row { display: flex; gap: 10px; }
-    .panel .row > div { flex: 1; }
 
     .panel button {
       width: 100%;
-      padding: 14px;
-      border-radius: 14px;
+      padding: 12px;
+      border-radius: 12px;
       border: none;
       background: var(--accent);
       color: #fff;
-      font-weight: 700;
+      font-weight: 600;
       margin-top: 12px;
       cursor: pointer;
-      transition: 0.3s;
     }
-
-    .panel button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,122,255,0.3); }
-    .panel .btn-secondary { background: rgba(255,255,255,0.15); }
-    .panel .btn-danger { background: #ff3b30; }
 
     .show-panel-btn {
       position: fixed;
       top: 20px;
       left: 20px;
       z-index: 1001;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.6);
       color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 12px 24px;
-      border-radius: 15px;
+      padding: 10px 20px;
+      border-radius: 12px;
       display: none;
       cursor: pointer;
-      font-weight: 700;
-      backdrop-filter: blur(10px);
     }
-
-    /* Range Slider Styling */
-    input[type=range] { -webkit-appearance: none; background: transparent; }
-    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: var(--accent); margin-top: -6px; cursor: pointer; }
 
     @media (max-width: 480px) {
       .time { font-size: 90px; }
@@ -221,124 +196,69 @@
 </head>
 <body>
 
-  <!-- Background Engine -->
-  <div class="bg-container" id="bgContainer">
+  <div class="bg-container">
     <img id="bgImg" class="bg-media" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80">
     <video id="bgVid" class="bg-media" style="display:none;" loop muted playsinline></video>
   </div>
 
-  <!-- Dynamic Island -->
-  <div class="dynamic-island-container">
-    <div class="dynamic-island" id="island">
-      <div class="island-content" id="islandContent">
-        <span style="color:#ff3b30">●</span>
-        <span id="islandText">إشعار جديد</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="content" id="mainContent">
+  <div class="content">
     <div class="time" id="time">00:00</div>
     
-    <div class="widgets-row" id="widgetsRow">
-      <div class="widget-item" id="w-battery">
-        <span class="widget-icon">🔋</span>
-        <span>85%</span>
-      </div>
-      <div class="widget-item" id="w-weather">
-        <span class="widget-icon">☀️</span>
-        <span>28°</span>
-      </div>
-      <div class="widget-item" id="w-day">
-        <span class="widget-icon">📅</span>
-        <span id="widgetDay">--</span>
-      </div>
-    </div>
-
     <div class="date-container">
       <div class="date" id="date">--</div>
       <div class="hijri" id="hijri">--</div>
     </div>
 
+    <!-- Music Widget -->
+    <div class="music-widget" id="musicWidget">
+      <div class="music-top">
+        <div class="music-art" id="musicArt"></div>
+        <div class="music-info">
+          <div class="music-title" id="musicTitle">اسم السورة / المقطع</div>
+          <div class="music-artist" id="musicArtist">اسم القارئ / المنشد</div>
+        </div>
+      </div>
+      <div class="music-progress-container">
+        <div class="music-progress-bar" id="musicProgress"></div>
+      </div>
+      <div class="music-controls">
+        <span>⏮</span>
+        <span>⏸</span>
+        <span>⏭</span>
+      </div>
+    </div>
+
     <div class="notifications-area" id="notificationsArea"></div>
   </div>
 
-  <button class="show-panel-btn" id="showBtn" onclick="togglePanel()">⚙️ تخصيص المحرك</button>
+  <button class="show-panel-btn" id="showBtn" onclick="togglePanel()">⚙️ الإعدادات</button>
 
-  <!-- Advanced Control Panel -->
   <div class="panel" id="panel">
-    <h2>LockScreen Engine Pro</h2>
+    <h2>LockScreen Cinematic Stacked</h2>
     
-    <div class="panel-section">
-      <label>نوع الخلفية:</label>
-      <select id="bgType" onchange="updateBgType(this.value)">
-        <option value="image">صورة ثابتة</option>
-        <option value="video">خلفية حية (فيديو)</option>
-      </select>
-      <label>رابط الوسائط:</label>
-      <input type="text" id="bgUrl" placeholder="ضع الرابط هنا..." oninput="applyBg(this.value)">
-      
-      <div class="row">
-        <div>
-          <label>الضبابية (Blur):</label>
-          <input type="range" min="0" max="20" value="0" oninput="updateStyle('--bgBlur', this.value + 'px')">
-        </div>
-        <div>
-          <label>السطوع:</label>
-          <input type="range" min="0.2" max="1" step="0.1" value="0.8" oninput="updateStyle('--bgBrightness', this.value)">
-        </div>
-      </div>
-    </div>
+    <label>مشغل الموسيقى:</label>
+    <select id="showMusic" onchange="toggleMusic(this.value)">
+      <option value="no">إخفاء</option>
+      <option value="yes">إظهار</option>
+    </select>
+    <input type="text" id="mTitle" placeholder="العنوان..." oninput="updateMusic()">
+    <input type="text" id="mArtist" placeholder="الفنان..." oninput="updateMusic()">
+    <input type="text" id="mArt" placeholder="رابط الغلاف..." oninput="updateMusic()">
 
-    <div class="panel-section">
-      <label>تخصيص المظهر:</label>
-      <div class="row">
-        <div>
-          <label>لون النصوص:</label>
-          <input type="color" value="#ffffff" oninput="updateStyle('--mainColor', this.value)">
-        </div>
-        <div>
-          <label>نوع الخط:</label>
-          <select onchange="document.body.style.fontFamily = this.value">
-            <option value="Cairo">Cairo (iOS)</option>
-            <option value="Almarai">Almarai</option>
-            <option value="Tajawal">Tajawal</option>
-          </select>
-        </div>
-      </div>
-      <label>إظهار الودجت:</label>
-      <div class="row" style="font-size:10px">
-        <label><input type="checkbox" checked onchange="toggleEl('w-battery', this.checked)"> بطارية</label>
-        <label><input type="checkbox" checked onchange="toggleEl('w-weather', this.checked)"> طقس</label>
-        <label><input type="checkbox" checked onchange="toggleEl('w-day', this.checked)"> يوم</label>
-      </div>
-    </div>
-
-    <div class="panel-section">
-      <label>الإشعارات:</label>
-      <textarea id="notifList" rows="3" placeholder="كل سطر إشعار..."></textarea>
-      <div class="row">
-        <div>
-          <label>الفاصل (ث):</label>
-          <input type="number" id="gap" value="4">
-        </div>
-        <div>
-          <label>الصوت:</label>
-          <select id="notifSound">
-            <option value="on">تشغيل</option>
-            <option value="off">إيقاف</option>
-          </select>
-        </div>
-      </div>
-      <button onclick="startSequence()">▶ بدء العرض</button>
-    </div>
-
-    <button class="btn-secondary" onclick="togglePanel()">🎥 وضع التصوير</button>
-    <button class="btn-danger" onclick="clearAll()">🧹 إعادة ضبط المصنع</button>
+    <label>نوع الخلفية:</label>
+    <select id="bgType" onchange="updateBgType(this.value)">
+      <option value="image">صورة</option>
+      <option value="video">فيديو (خلفية حية)</option>
+    </select>
+    <input type="text" id="bgUrl" placeholder="الرابط هنا..." oninput="applyBg(this.value)">
+    
+    <label>الإشعارات (كل سطر إشعار):</label>
+    <textarea id="notifList" rows="4" placeholder="اكتب هنا..."></textarea>
+    
+    <button onclick="startSequence()">▶ بدء العرض المتداخل</button>
+    <button style="background:#555" onclick="togglePanel()">🎥 وضع التصوير</button>
+    <button style="background:#ff3b30" onclick="location.reload()">🧹 إعادة ضبط</button>
   </div>
-
-  <audio id="notifAudio" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
 
   <script>
     function updateClock() {
@@ -349,44 +269,44 @@
       const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
       const months = ['يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
       document.getElementById('date').textContent = `${days[now.getDay()]} ,${now.getDate()} ${months[now.getMonth()]}`;
-      document.getElementById('widgetDay').textContent = days[now.getDay()];
       const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {day:'numeric', month:'long', year:'numeric'}).format(now);
       document.getElementById('hijri').textContent = hijri.replace('هـ', '').trim();
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    function updateStyle(prop, val) { document.documentElement.style.setProperty(prop, val); }
-    function toggleEl(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
+    function toggleMusic(val) {
+      document.getElementById('musicWidget').classList.toggle('active', val === 'yes');
+      if(val === 'yes') startMusicProgress();
+    }
+
+    function updateMusic() {
+      document.getElementById('musicTitle').textContent = document.getElementById('mTitle').value || "اسم السورة / المقطع";
+      document.getElementById('musicArtist').textContent = document.getElementById('mArtist').value || "اسم القارئ / المنشد";
+      const art = document.getElementById('mArt').value;
+      if(art) document.getElementById('musicArt').style.backgroundImage = `url('${art}')`;
+    }
+
+    function startMusicProgress() {
+      let p = 0;
+      setInterval(() => {
+        p = (p + 1) % 100;
+        document.getElementById('musicProgress').style.width = p + '%';
+      }, 1000);
+    }
 
     function updateBgType(type) {
-      const img = document.getElementById('bgImg');
-      const vid = document.getElementById('bgVid');
-      if(type === 'video') {
-        img.style.display = 'none';
-        vid.style.display = 'block';
-      } else {
-        img.style.display = 'block';
-        vid.style.display = 'none';
-      }
+      document.getElementById('bgImg').style.display = type === 'image' ? 'block' : 'none';
+      document.getElementById('bgVid').style.display = type === 'video' ? 'block' : 'none';
     }
 
     function applyBg(url) {
       const type = document.getElementById('bgType').value;
       if(type === 'video') {
-        const vid = document.getElementById('bgVid');
-        vid.src = url;
-        vid.play().catch(()=>{});
+        const v = document.getElementById('bgVid'); v.src = url; v.play().catch(()=>{});
       } else {
         document.getElementById('bgImg').src = url;
       }
-    }
-
-    function triggerIsland(text) {
-      const island = document.getElementById('island');
-      document.getElementById('islandText').textContent = text.substring(0, 25);
-      island.classList.add('expanded');
-      setTimeout(() => island.classList.remove('expanded'), 3000);
     }
 
     function addNotification(text) {
@@ -398,18 +318,15 @@
       const m = String(now.getMinutes()).padStart(2, '0');
       const ampm = now.getHours() >= 12 ? 'م' : 'ص';
 
-      if(document.getElementById('notifSound').value === 'on') document.getElementById('notifAudio').play().catch(()=>{});
-      triggerIsland(text);
-
       box.innerHTML = `
         <div class="notif-top">
-          <div class="notif-right"><span class="notif-label">الآن</span><span class="notif-arrow">⬇</span><svg class="notif-icon-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
-          <div class="notif-left"><span class="notif-time">${h}:${m} ${ampm}</span><div class="notif-more">...</div></div>
+          <div class="notif-right"><span class="notif-label">الآن</span><span class="notif-arrow">⬇</span></div>
+          <div class="notif-left"><span class="notif-time">${h}:${m} ${ampm}</span></div>
         </div>
         <div class="notif-body">${text}</div>
       `;
       area.prepend(box);
-      if(area.children.length > 4) area.lastChild.remove();
+      if(area.children.length > 3) area.lastChild.remove();
     }
 
     let timer = null;
@@ -422,7 +339,7 @@
       timer = setInterval(() => {
         if(i >= list.length) i = 0;
         addNotification(list[i++]);
-      }, document.getElementById('gap').value * 1000);
+      }, 4000);
       togglePanel();
     }
 
@@ -432,8 +349,6 @@
       p.classList.toggle('hidden');
       b.style.display = p.classList.contains('hidden') ? 'block' : 'none';
     }
-
-    function clearAll() { location.reload(); }
   </script>
 </body>
 </html>
