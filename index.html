@@ -2,20 +2,29 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lock Screen Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>LockScreen Studio (Cinematic)</title>
 
   <style>
+    :root{
+      --glass: rgba(255,255,255,0.86);
+      --glassBorder: rgba(255,255,255,0.22);
+      --shadow: 0px 18px 55px rgba(0,0,0,0.40);
+      --textShadow: 0px 6px 35px rgba(0,0,0,0.85);
+    }
+
+    *{ box-sizing: border-box; }
+
     body {
       margin: 0;
       height: 100vh;
       overflow: hidden;
-      font-family: Arial, sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
       background: black;
       color: white;
     }
 
-    /* فيديو الخلفية */
+    /* خلفية */
     video.bg-video {
       position: absolute;
       inset: 0;
@@ -23,227 +32,295 @@
       height: 100%;
       object-fit: cover;
       z-index: 1;
-      filter: brightness(0.70);
+      filter: brightness(0.75) contrast(1.05) saturate(1.05);
     }
 
-    /* صورة الخلفية */
     .bg-image {
       position: absolute;
       inset: 0;
       background-size: cover;
       background-position: center;
       z-index: 1;
-      filter: brightness(0.70);
+      filter: brightness(0.75) contrast(1.05) saturate(1.05);
+      transform: scale(1.02);
     }
 
-    /* طبقة تعتيم */
+    /* تعتيم + لمعة سينمائية */
     .dark-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.20);
+      background: radial-gradient(circle at 20% 15%, rgba(255,255,255,0.12), rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.70));
       z-index: 2;
     }
 
-    /* النص */
+    /* طبقة Grain */
+    .film-grain{
+      position:absolute;
+      inset:0;
+      z-index:4;
+      pointer-events:none;
+      opacity:0.07;
+      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+      mix-blend-mode: overlay;
+    }
+
+    /* المحتوى */
     .content {
       position: relative;
-      z-index: 3;
+      z-index: 5;
       height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
-      padding-top: 110px;
+      padding-top: 90px;
       text-align: center;
-      text-shadow: 0px 4px 30px rgba(0,0,0,0.85);
+      text-shadow: var(--textShadow);
+    }
+
+    .lock {
+      font-size: 18px;
+      opacity: 0.9;
+      margin-bottom: 14px;
+      letter-spacing: 1px;
       user-select: none;
     }
 
     .time {
-      font-size: 95px;
-      font-weight: 700;
+      font-size: 96px;
+      font-weight: 800;
       letter-spacing: 2px;
-      line-height: 1;
+      line-height: 1.05;
+      user-select: none;
     }
 
     .date {
       font-size: 30px;
       margin-top: 10px;
-      opacity: 0.95;
+      opacity: 0.96;
+      user-select: none;
     }
 
     .hijri {
       font-size: 25px;
       margin-top: 8px;
-      opacity: 0.9;
+      opacity: 0.92;
+      user-select: none;
     }
 
-    /* إشعارات */
+    /* منطقة الإشعارات */
     .notifications-area {
       width: 92%;
       max-width: 520px;
-      margin-top: 45px;
+      margin-top: 40px;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      align-items: center;
     }
 
+    /* إشعار زجاجي */
     .notification-box {
       width: 100%;
-      background: rgba(255, 255, 255, 0.88);
-      color: black;
-      border-radius: 18px;
+      background: var(--glass);
+      color: #111;
+      border-radius: 22px;
       padding: 14px 18px;
-      box-shadow: 0px 10px 30px rgba(0,0,0,0.35);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      animation: dropDown 0.55s ease;
-      transform-origin: top;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--glassBorder);
+
+      transform: translateY(-45px) scale(0.96);
+      opacity: 0;
+      animation: cinematicDrop 0.75s cubic-bezier(0.19, 1, 0.22, 1) forwards;
     }
 
     .notification-header {
       display: flex;
       justify-content: space-between;
       font-size: 15px;
-      opacity: 0.8;
+      opacity: 0.78;
       margin-bottom: 10px;
-      font-weight: bold;
+      font-weight: 800;
+      user-select: none;
     }
 
     .notification-message {
       font-size: 22px;
-      font-weight: 500;
+      font-weight: 650;
       text-align: center;
       line-height: 1.5;
-      word-break: break-word;
+      user-select: none;
     }
 
-    .no-old {
-      margin-top: 12px;
-      font-size: 22px;
-      color: rgba(255,255,255,0.7);
-      text-shadow: 0px 4px 30px rgba(0,0,0,0.85);
-      opacity: 1;
-      transition: 0.4s;
-    }
-
-    @keyframes dropDown {
-      from {
-        transform: translateY(-35px) scale(0.98);
+    @keyframes cinematicDrop {
+      0% {
+        transform: translateY(-45px) scale(0.96);
         opacity: 0;
       }
-      to {
+      65% {
+        transform: translateY(6px) scale(1.01);
+        opacity: 1;
+      }
+      85% {
+        transform: translateY(-2px) scale(0.995);
+      }
+      100% {
         transform: translateY(0px) scale(1);
         opacity: 1;
       }
     }
 
+    /* لا توجد إشعارات قديمة */
+    .no-old {
+      margin-top: 12px;
+      font-size: 22px;
+      color: rgba(255,255,255,0.78);
+      text-shadow: var(--textShadow);
+
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: 1.2s ease;
+      user-select: none;
+    }
+
+    .no-old.show {
+      opacity: 1;
+      transform: translateY(0px);
+    }
+
+    /* شريط السحب السفلي */
+    .swipe-bar{
+      position:absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      z-index: 6;
+      opacity: 0.7;
+      filter: blur(0.1px);
+    }
+
     /* لوحة التحكم */
     .panel {
       position: fixed;
-      bottom: 16px;
-      left: 16px;
+      bottom: 18px;
+      left: 18px;
       width: 340px;
-      background: rgba(0,0,0,0.65);
+      max-width: calc(100vw - 36px);
+      background: rgba(0,0,0,0.68);
       color: white;
-      padding: 15px;
+      padding: 14px;
       border-radius: 18px;
       z-index: 9999;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0px 10px 30px rgba(0,0,0,0.6);
-      font-family: Arial;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0px 16px 50px rgba(0,0,0,0.65);
+      border: 1px solid rgba(255,255,255,0.12);
     }
 
     .panel h2 {
       margin: 0 0 10px;
-      font-size: 18px;
+      font-size: 16px;
+      letter-spacing: 0.3px;
     }
 
     .panel label {
       display: block;
       margin-top: 10px;
-      font-size: 13px;
+      font-size: 12px;
       opacity: 0.85;
     }
 
-    .panel input, .panel select, .panel textarea {
+    .panel input, .panel textarea, .panel select {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
-      border-radius: 10px;
+      margin-top: 6px;
+      border-radius: 12px;
       border: none;
       outline: none;
-      font-size: 14px;
-      box-sizing: border-box;
+      font-size: 13px;
+      background: rgba(255,255,255,0.12);
+      color: white;
     }
 
-    .panel textarea {
-      min-height: 70px;
+    .panel textarea{
+      min-height: 72px;
       resize: vertical;
     }
 
-    .panel .row {
-      display: flex;
-      gap: 10px;
+    .row{
+      display:flex;
+      gap:10px;
+      margin-top: 10px;
     }
 
-    .panel .row > div {
-      flex: 1;
+    .row > div{
+      flex:1;
     }
 
     .panel button {
       width: 100%;
       margin-top: 10px;
-      padding: 10px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      background: rgba(255,255,255,0.2);
-      color: white;
-    }
-
-    .panel button:hover {
-      background: rgba(255,255,255,0.28);
-    }
-
-    .panel .hint {
-      margin-top: 10px;
-      font-size: 12px;
-      opacity: 0.75;
-      line-height: 1.6;
-    }
-
-    .floating-hide {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      z-index: 10000;
-      padding: 10px 14px;
-      border-radius: 12px;
+      padding: 11px;
+      border-radius: 14px;
       border: none;
       cursor: pointer;
       font-size: 14px;
-      background: rgba(0,0,0,0.55);
+      font-weight: 700;
+      background: rgba(255,255,255,0.18);
       color: white;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: none;
+      transition: 0.2s;
     }
 
-    /* موبايل */
-    @media (max-width: 450px) {
-      .panel {
-        width: calc(100% - 32px);
-      }
-      .time {
-        font-size: 82px;
-      }
-      .notification-message {
-        font-size: 20px;
-      }
+    .panel button:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.24);
+    }
+
+    .panel .btn-danger{
+      background: rgba(255,60,60,0.18);
+    }
+    .panel .btn-danger:hover{
+      background: rgba(255,60,60,0.28);
+    }
+
+    .panel .btn-good{
+      background: rgba(80,255,140,0.18);
+    }
+    .panel .btn-good:hover{
+      background: rgba(80,255,140,0.26);
+    }
+
+    .panel .btn-hide{
+      background: rgba(120,180,255,0.18);
+    }
+    .panel .btn-hide:hover{
+      background: rgba(120,180,255,0.28);
+    }
+
+    .mini-note{
+      margin-top: 10px;
+      font-size: 11px;
+      opacity: 0.7;
+      line-height: 1.4;
+    }
+
+    /* إخفاء اللوحة أثناء التصوير */
+    .hidden{
+      display:none !important;
+    }
+
+    /* مناسب للجوال */
+    @media (max-width: 420px){
+      .content{ padding-top: 80px; }
+      .time{ font-size: 82px; }
+      .date{ font-size: 26px; }
+      .hijri{ font-size: 22px; }
+      .notification-message{ font-size: 20px; }
     }
   </style>
 </head>
@@ -254,8 +331,11 @@
   <div class="bg-image" id="bgImage"></div>
 
   <div class="dark-overlay"></div>
+  <div class="film-grain"></div>
 
   <div class="content">
+    <div class="lock">🔒</div>
+
     <div class="time" id="time">12:05</div>
     <div class="date" id="date">الأربعاء « 13 مايو</div>
     <div class="hijri" id="hijri">26 « ذو القعدة 1447هـ</div>
@@ -264,110 +344,89 @@
     <div class="no-old" id="noOld">لا توجد إشعارات قديمة</div>
   </div>
 
-  <button class="floating-hide" id="showPanelBtn" onclick="showPanel()">إظهار لوحة التحكم</button>
+  <div class="swipe-bar"></div>
 
+  <!-- لوحة التحكم -->
   <div class="panel" id="panel">
-    <h2>Lock Screen Studio</h2>
+    <h2>🎬 LockScreen Studio - لوحة التحكم</h2>
 
-    <label>الخلفية (رابط صورة):</label>
-    <input type="text" id="bgUrl" placeholder="ضع رابط الصورة هنا">
+    <label>خلفية (رابط صورة):</label>
+    <input type="text" id="bgUrl" placeholder="ضع رابط صورة..." />
 
     <label>أو اختر صورة من جهازك:</label>
-    <input type="file" id="bgFile" accept="image/*">
+    <input type="file" id="bgFile" accept="image/*" />
+
+    <hr style="opacity:0.15; margin:12px 0;">
+
+    <label>نص الإشعار 1:</label>
+    <input type="text" id="n1" placeholder="اكتب النص..." />
+
+    <label>نص الإشعار 2:</label>
+    <input type="text" id="n2" placeholder="اكتب النص..." />
+
+    <label>نص الإشعار 3:</label>
+    <input type="text" id="n3" placeholder="اكتب النص..." />
+
+    <label>نص الإشعار 4:</label>
+    <input type="text" id="n4" placeholder="اكتب النص..." />
 
     <div class="row">
       <div>
-        <label>أقصى عدد إشعارات:</label>
-        <input type="number" id="maxNotifs" value="4" min="1" max="12">
+        <label>الفاصل بين الإشعارات (ثواني):</label>
+        <input type="number" id="gap" value="3" min="1" />
       </div>
       <div>
-        <label>مدة كل إشعار (ث):</label>
-        <input type="number" id="notifLife" value="10" min="2" max="60">
+        <label>أقصى عدد إشعارات:</label>
+        <input type="number" id="maxNotifs" value="6" min="1" />
       </div>
     </div>
 
-    <label>نص الإشعار (سطر واحد أو أكثر):</label>
-    <textarea id="notifText" placeholder="اكتب نص الإشعار هنا..."></textarea>
-
     <div class="row">
       <div>
-        <label>تأخير الظهور (ث):</label>
-        <input type="number" id="notifDelay" value="2" min="0" max="60">
+        <label>وضع التشغيل:</label>
+        <select id="mode">
+          <option value="once">مرة واحدة</option>
+          <option value="loop">تشغيل مستمر 🔁</option>
+        </select>
       </div>
       <div>
-        <label>وضع تلقائي:</label>
-        <select id="autoMode">
-          <option value="off">مغلق</option>
-          <option value="on">تشغيل</option>
+        <label>إظهار "لا توجد إشعارات قديمة":</label>
+        <select id="showNoOld">
+          <option value="yes">نعم</option>
+          <option value="no">لا</option>
         </select>
       </div>
     </div>
 
-    <label>قائمة تلقائية (كل سطر إشعار):</label>
-    <textarea id="autoList" placeholder="مثال:
-يارب مالي حاجة في رجا عبد
-استغفر الله العظيم
-اللهم صل وسلم على نبينا محمد"></textarea>
+    <button class="btn-good" onclick="startAuto()">▶ تشغيل الإشعارات تلقائيًا</button>
+    <button onclick="stopAuto()">⏹ إيقاف</button>
+    <button class="btn-danger" onclick="resetAll()">🧹 مسح الإشعارات</button>
 
-    <button onclick="addNotifFromPanel()">إضافة إشعار الآن</button>
-    <button onclick="startAuto()">بدء الإشعارات التلقائية</button>
-    <button onclick="stopAuto()">إيقاف الإشعارات التلقائية</button>
+    <div class="row">
+      <div><button class="btn-hide" onclick="togglePanel()">🎥 وضع التصوير (إخفاء اللوحة)</button></div>
+      <div><button onclick="goFullscreen()">⛶ Fullscreen</button></div>
+    </div>
 
-    <button onclick="toggleFullscreen()">ملء الشاشة (Fullscreen)</button>
-    <button onclick="hidePanel()">وضع التصوير (إخفاء اللوحة)</button>
-    <button onclick="clearNotifications()">مسح كل الإشعارات</button>
-
-    <div class="hint">
-      💡 نصيحة: بعد تجهيز الإشعارات اضغط "وضع التصوير" ثم ابدأ تسجيل الشاشة.<br>
-      الإعدادات تحفظ تلقائيًا حتى بعد إغلاق المتصفح.
+    <div class="mini-note">
+      💡 نصيحة: اكتب 4 إشعارات، اختر "تشغيل مستمر"، ثم اضغط "وضع التصوير"، وابدأ تسجيل الشاشة.
     </div>
   </div>
 
   <script>
-    // عناصر
+    // =========================
+    // خلفية افتراضية
+    // =========================
     const bgImage = document.getElementById("bgImage");
+    const defaultBg = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1440&q=80";
+    bgImage.style.backgroundImage = `url('${defaultBg}')`;
+
+    // =========================
+    // الوقت والتاريخ
+    // =========================
     const timeEl = document.getElementById("time");
     const dateEl = document.getElementById("date");
     const hijriEl = document.getElementById("hijri");
-    const notificationsArea = document.getElementById("notificationsArea");
-    const noOld = document.getElementById("noOld");
-    const panel = document.getElementById("panel");
-    const showPanelBtn = document.getElementById("showPanelBtn");
 
-    // إعدادات افتراضية
-    const DEFAULT_BG = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80";
-    bgImage.style.backgroundImage = `url('${DEFAULT_BG}')`;
-
-    // حفظ/تحميل الإعدادات
-    function saveSettings() {
-      const settings = {
-        bgUrl: document.getElementById("bgUrl").value,
-        maxNotifs: document.getElementById("maxNotifs").value,
-        notifLife: document.getElementById("notifLife").value,
-        autoList: document.getElementById("autoList").value,
-        autoMode: document.getElementById("autoMode").value
-      };
-      localStorage.setItem("lockStudioSettings", JSON.stringify(settings));
-    }
-
-    function loadSettings() {
-      const raw = localStorage.getItem("lockStudioSettings");
-      if (!raw) return;
-
-      try {
-        const s = JSON.parse(raw);
-
-        if (s.bgUrl) document.getElementById("bgUrl").value = s.bgUrl;
-        if (s.maxNotifs) document.getElementById("maxNotifs").value = s.maxNotifs;
-        if (s.notifLife) document.getElementById("notifLife").value = s.notifLife;
-        if (s.autoList) document.getElementById("autoList").value = s.autoList;
-        if (s.autoMode) document.getElementById("autoMode").value = s.autoMode;
-
-        if (s.bgUrl) bgImage.style.backgroundImage = `url('${s.bgUrl}')`;
-      } catch(e) {}
-    }
-
-    // تحديث الساعة
     function updateClock() {
       const now = new Date();
 
@@ -392,13 +451,24 @@
     updateClock();
     setInterval(updateClock, 1000);
 
-    // إشعار واحد
-    function addNotification(message) {
+    // =========================
+    // نظام الإشعارات السينمائي
+    // =========================
+    const notificationsArea = document.getElementById("notificationsArea");
+    const noOld = document.getElementById("noOld");
+
+    function getNowTime() {
       const now = new Date();
-      const notifTime = now.toLocaleTimeString("ar", {
-        hour: "2-digit",
-        minute: "2-digit"
-      });
+      return now.toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function addNotification(message) {
+      const max = parseInt(document.getElementById("maxNotifs").value || "6");
+
+      // حد أقصى إشعارات (نحذف الأقدم)
+      while (notificationsArea.children.length >= max) {
+        notificationsArea.removeChild(notificationsArea.firstChild);
+      }
 
       const box = document.createElement("div");
       box.className = "notification-box";
@@ -406,144 +476,199 @@
       box.innerHTML = `
         <div class="notification-header">
           <span>الآن ⬇</span>
-          <span>${notifTime}</span>
+          <span>${getNowTime()}</span>
         </div>
-        <div class="notification-message">${message}</div>
+        <div class="notification-message">${escapeHtml(message)}</div>
       `;
 
       notificationsArea.appendChild(box);
-      noOld.style.opacity = "0";
 
-      // حد أقصى للإشعارات
-      const max = parseInt(document.getElementById("maxNotifs").value || "4");
-      while (notificationsArea.children.length > max) {
-        notificationsArea.removeChild(notificationsArea.firstChild);
-      }
-
-      // حذف تلقائي بعد مدة
-      const life = parseInt(document.getElementById("notifLife").value || "10");
-      setTimeout(() => {
-        box.style.opacity = "0";
-        box.style.transform = "translateY(-12px) scale(0.99)";
-        box.style.transition = "0.35s";
-        setTimeout(() => {
-          if (box.parentNode) box.remove();
-          if (notificationsArea.children.length === 0) noOld.style.opacity = "1";
-        }, 350);
-      }, life * 1000);
+      // عند ظهور إشعار نخفي "لا توجد إشعارات قديمة"
+      noOld.classList.remove("show");
     }
 
-    // إضافة من اللوحة
-    function addNotifFromPanel() {
-      const text = document.getElementById("notifText").value.trim();
-      const delay = parseInt(document.getElementById("notifDelay").value || "0");
-
-      if (!text) {
-        alert("اكتب نص الإشعار أولاً");
-        return;
-      }
-
-      document.getElementById("notifText").value = "";
-      saveSettings();
-
-      setTimeout(() => {
-        addNotification(text);
-      }, delay * 1000);
+    function escapeHtml(str) {
+      return str
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    // خلفية رابط
-    document.getElementById("bgUrl").addEventListener("input", function() {
-      const url = this.value.trim();
-      if (url) bgImage.style.backgroundImage = `url('${url}')`;
-      saveSettings();
-    });
+    function showNoOldGradually() {
+      const opt = document.getElementById("showNoOld").value;
+      if (opt === "yes") {
+        noOld.classList.add("show");
+      }
+    }
 
-    // خلفية من الجهاز
-    document.getElementById("bgFile").addEventListener("change", function(event){
-      const file = event.target.files[0];
-      if(!file) return;
+    // =========================
+    // تشغيل تلقائي 4 إشعارات
+    // =========================
+    let timer = null;
+    let loopTimer = null;
 
-      const url = URL.createObjectURL(file);
-      bgImage.style.backgroundImage = `url('${url}')`;
+    function readNotifs() {
+      const arr = [
+        document.getElementById("n1").value.trim(),
+        document.getElementById("n2").value.trim(),
+        document.getElementById("n3").value.trim(),
+        document.getElementById("n4").value.trim(),
+      ].filter(x => x.length > 0);
 
-      // لا نحفظ رابط blob لأنه يتغير بعد إعادة فتح الصفحة
-      document.getElementById("bgUrl").value = "";
-      saveSettings();
-    });
-
-    // أوتو مود
-    let autoTimer = null;
-    let autoIndex = 0;
-
-    function getAutoMessages() {
-      const raw = document.getElementById("autoList").value.trim();
-      if (!raw) return [];
-      return raw.split("\n").map(x => x.trim()).filter(Boolean);
+      return arr;
     }
 
     function startAuto() {
       stopAuto();
+      resetNotificationsOnly();
 
-      const mode = document.getElementById("autoMode").value;
-      if (mode !== "on") {
-        alert("فعل وضع تلقائي من القائمة أولاً");
-        return;
-      }
+      const gap = Math.max(1, parseInt(document.getElementById("gap").value || "3"));
+      const mode = document.getElementById("mode").value;
+      const list = readNotifs();
 
-      const msgs = getAutoMessages();
-      if (msgs.length === 0) {
-        alert("اكتب إشعارات في القائمة التلقائية (كل سطر إشعار)");
+      if (list.length === 0) {
+        alert("اكتب نص واحد على الأقل في خانات الإشعارات.");
         return;
       }
 
       saveSettings();
 
-      autoTimer = setInterval(() => {
-        addNotification(msgs[autoIndex]);
-        autoIndex = (autoIndex + 1) % msgs.length;
-      }, 3500);
+      let i = 0;
+
+      function playSequence() {
+        i = 0;
+
+        // تشغيل متسلسل
+        timer = setInterval(() => {
+          if (i < list.length) {
+            addNotification(list[i]);
+            i++;
+          } else {
+            clearInterval(timer);
+            timer = null;
+
+            // بعد آخر إشعار نعرض "لا توجد إشعارات قديمة"
+            setTimeout(() => {
+              showNoOldGradually();
+            }, 700);
+
+            // لو تشغيل مستمر نعيد بعد فترة
+            if (mode === "loop") {
+              loopTimer = setTimeout(() => {
+                resetNotificationsOnly();
+                playSequence();
+              }, gap * 1000 + 1200);
+            }
+          }
+        }, gap * 1000);
+      }
+
+      playSequence();
     }
 
     function stopAuto() {
-      if (autoTimer) {
-        clearInterval(autoTimer);
-        autoTimer = null;
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      if (loopTimer) {
+        clearTimeout(loopTimer);
+        loopTimer = null;
       }
     }
 
-    // وضع التصوير
-    function hidePanel() {
-      panel.style.display = "none";
-      showPanelBtn.style.display = "block";
-    }
-
-    function showPanel() {
-      panel.style.display = "block";
-      showPanelBtn.style.display = "none";
-    }
-
-    // ملء الشاشة
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(()=>{});
-      } else {
-        document.exitFullscreen().catch(()=>{});
-      }
-    }
-
-    // مسح الإشعارات
-    function clearNotifications() {
+    function resetNotificationsOnly(){
       notificationsArea.innerHTML = "";
-      noOld.style.opacity = "1";
+      noOld.classList.remove("show");
     }
 
-    // حفظ تلقائي عند تغيير الإعدادات
-    ["maxNotifs","notifLife","autoList","autoMode"].forEach(id => {
-      document.getElementById(id).addEventListener("input", saveSettings);
-      document.getElementById(id).addEventListener("change", saveSettings);
+    function resetAll() {
+      stopAuto();
+      resetNotificationsOnly();
+    }
+
+    // =========================
+    // لوحة التحكم
+    // =========================
+    function togglePanel() {
+      document.getElementById("panel").classList.toggle("hidden");
+    }
+
+    function goFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }
+
+    // =========================
+    // خلفية من رابط / ملف
+    // =========================
+    const bgUrl = document.getElementById("bgUrl");
+    const bgFile = document.getElementById("bgFile");
+
+    bgUrl.addEventListener("change", () => {
+      const url = bgUrl.value.trim();
+      if (!url) return;
+      bgImage.style.backgroundImage = `url('${url}')`;
+      saveSettings();
     });
 
-    // تحميل إعدادات عند فتح الصفحة
+    bgFile.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      bgImage.style.backgroundImage = `url('${url}')`;
+    });
+
+    // =========================
+    // حفظ الإعدادات
+    // =========================
+    function saveSettings(){
+      const data = {
+        bgUrl: bgUrl.value,
+        n1: document.getElementById("n1").value,
+        n2: document.getElementById("n2").value,
+        n3: document.getElementById("n3").value,
+        n4: document.getElementById("n4").value,
+        gap: document.getElementById("gap").value,
+        maxNotifs: document.getElementById("maxNotifs").value,
+        mode: document.getElementById("mode").value,
+        showNoOld: document.getElementById("showNoOld").value
+      };
+      localStorage.setItem("LockScreenStudioSettings", JSON.stringify(data));
+    }
+
+    function loadSettings(){
+      try{
+        const raw = localStorage.getItem("LockScreenStudioSettings");
+        if(!raw) return;
+        const d = JSON.parse(raw);
+
+        if(d.bgUrl){
+          bgUrl.value = d.bgUrl;
+          bgImage.style.backgroundImage = `url('${d.bgUrl}')`;
+        }
+
+        document.getElementById("n1").value = d.n1 ?? "";
+        document.getElementById("n2").value = d.n2 ?? "";
+        document.getElementById("n3").value = d.n3 ?? "";
+        document.getElementById("n4").value = d.n4 ?? "";
+        document.getElementById("gap").value = d.gap ?? "3";
+        document.getElementById("maxNotifs").value = d.maxNotifs ?? "6";
+        document.getElementById("mode").value = d.mode ?? "once";
+        document.getElementById("showNoOld").value = d.showNoOld ?? "yes";
+      }catch(e){}
+    }
+
+    // حفظ تلقائي عند الكتابة
+    ["n1","n2","n3","n4","gap","maxNotifs","mode","showNoOld"].forEach(id=>{
+      const el = document.getElementById(id);
+      el.addEventListener("input", saveSettings);
+      el.addEventListener("change", saveSettings);
+    });
+
     loadSettings();
   </script>
 
