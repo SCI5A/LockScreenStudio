@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>LockScreen Studio - Exact Match</title>
+  <title>LockScreen Studio Pro - Smart Edition</title>
   
-  <!-- Google Fonts: Cairo for Arabic Text -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,29 +13,21 @@
     :root {
       --glass: rgba(255, 255, 255, 0.92);
       --textShadow: 0px 2px 15px rgba(0, 0, 0, 0.5);
+      --mainColor: #ffffff;
     }
 
-    * { 
-      box-sizing: border-box; 
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       height: 100vh;
       overflow: hidden;
       font-family: 'Cairo', sans-serif;
       background: #000;
-      color: #fff;
+      color: var(--mainColor);
+      transition: color 0.5s ease;
     }
 
-    /* Background */
-    .bg-container {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-    }
-
+    .bg-container { position: absolute; inset: 0; z-index: 1; }
     .bg-image {
       position: absolute;
       inset: 0;
@@ -45,9 +36,9 @@
       background-size: cover;
       background-position: center;
       filter: brightness(0.8);
+      transition: 0.5s;
     }
 
-    /* Main Content */
     .content {
       position: relative;
       z-index: 10;
@@ -61,29 +52,16 @@
 
     .time {
       font-size: 110px;
-      font-weight: 300; /* Thin as in image */
+      font-weight: 300;
       line-height: 1;
       text-shadow: var(--textShadow);
       letter-spacing: -2px;
     }
 
-    .date-container {
-      margin-top: 15px;
-      text-shadow: var(--textShadow);
-    }
+    .date-container { margin-top: 15px; text-shadow: var(--textShadow); }
+    .date { font-size: 32px; font-weight: 600; }
+    .hijri { font-size: 28px; font-weight: 500; margin-top: 5px; }
 
-    .date {
-      font-size: 32px;
-      font-weight: 600;
-    }
-
-    .hijri {
-      font-size: 28px;
-      font-weight: 500;
-      margin-top: 5px;
-    }
-
-    /* Notifications Area */
     .notifications-area {
       width: 94%;
       max-width: 500px;
@@ -100,182 +78,160 @@
       color: #000;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       animation: notifIn 0.5s ease-out forwards;
-      position: relative;
     }
 
-    .notif-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
+    .notif-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .notif-right { display: flex; align-items: center; gap: 6px; }
+    .notif-left { display: flex; align-items: center; gap: 8px; }
+    .notif-label { font-size: 18px; font-weight: 700; }
+    .notif-arrow { color: #ff3b30; font-size: 18px; }
+    .notif-icon-msg { width: 24px; height: 24px; opacity: 0.3; }
+    .notif-time { font-size: 18px; font-weight: 600; }
+    .notif-more { width: 24px; height: 24px; background: #e5e5ea; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: #8e8e93; }
+    .notif-body { font-size: 22px; font-weight: 600; text-align: center; padding: 5px 0 10px 0; }
 
-    .notif-right {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .no-old-text { margin-top: 15px; font-size: 24px; font-weight: 500; opacity: 0.9; text-shadow: var(--textShadow); }
 
-    .notif-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .notif-label {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .notif-arrow {
-      color: #ff3b30;
-      font-size: 18px;
-    }
-
-    .notif-icon-msg {
-      width: 24px;
-      height: 24px;
-      opacity: 0.3;
-    }
-
-    .notif-time {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .notif-more {
-      width: 24px;
-      height: 24px;
-      background: #e5e5ea;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
-      color: #8e8e93;
-    }
-
-    .notif-body {
-      font-size: 22px;
-      font-weight: 600;
-      text-align: center;
-      padding: 5px 0 10px 0;
-      word-wrap: break-word;
-    }
-
-    .no-old-text {
-      margin-top: 15px;
-      font-size: 24px;
-      font-weight: 500;
-      opacity: 0.9;
-      text-shadow: var(--textShadow);
-    }
-
-    @keyframes notifIn {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
+    @keyframes notifIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     /* Control Panel */
     .panel {
       position: fixed;
       bottom: 20px;
       left: 20px;
-      width: 320px;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 15px;
+      width: 340px;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(15px);
+      border-radius: 24px;
+      padding: 20px;
       z-index: 1000;
       border: 1px solid rgba(255,255,255,0.1);
       color: #fff;
+      max-height: 85vh;
+      overflow-y: auto;
     }
 
     .panel.hidden { display: none; }
-
-    .panel h2 { font-size: 16px; margin-bottom: 10px; color: #007AFF; }
-    .panel label { display: block; font-size: 11px; opacity: 0.7; margin-top: 8px; }
-    .panel input, .panel textarea {
+    .panel h2 { font-size: 18px; margin-bottom: 15px; color: #007AFF; text-align: center; }
+    .panel label { display: block; font-size: 12px; opacity: 0.7; margin-top: 12px; }
+    .panel input, .panel textarea, .panel select {
       width: 100%;
       background: rgba(255,255,255,0.1);
-      border: none;
-      border-radius: 8px;
-      padding: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
       color: #fff;
-      margin-top: 4px;
+      margin-top: 5px;
+      font-family: inherit;
     }
 
     .panel button {
       width: 100%;
-      padding: 10px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 12px;
       border: none;
       background: #007AFF;
       color: #fff;
       font-weight: 600;
-      margin-top: 10px;
+      margin-top: 12px;
       cursor: pointer;
+      transition: 0.2s;
     }
+
+    .panel button:hover { opacity: 0.9; transform: scale(0.98); }
+    .panel .btn-secondary { background: rgba(255,255,255,0.15); }
+    .panel .btn-danger { background: #ff3b30; }
 
     .show-panel-btn {
       position: fixed;
       top: 20px;
       left: 20px;
       z-index: 1001;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.6);
       color: #fff;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      border-radius: 12px;
       display: none;
+      cursor: pointer;
+      font-weight: 600;
     }
 
     @media (max-width: 480px) {
       .time { font-size: 90px; }
-      .date { font-size: 28px; }
-      .hijri { font-size: 24px; }
-      .notif-body { font-size: 20px; }
+      .panel { width: calc(100% - 40px); }
     }
   </style>
 </head>
 <body>
 
   <div class="bg-container">
+    <canvas id="bgCanvas" style="display:none;"></canvas>
     <div class="bg-image" id="bgImage"></div>
   </div>
 
   <div class="content">
-    <div class="time" id="time">12:03</div>
+    <div class="time" id="time">00:00</div>
     <div class="date-container">
-      <div class="date" id="date">الخميس ,30 إبريل</div>
-      <div class="hijri" id="hijri">13 ,ذو القعده, 1447</div>
+      <div class="date" id="date">--</div>
+      <div class="hijri" id="hijri">--</div>
     </div>
 
     <div class="notifications-area" id="notificationsArea"></div>
     <div class="no-old-text" id="noOldText">لاتوجد إشعارات قديمه</div>
   </div>
 
-  <button class="show-panel-btn" id="showBtn" onclick="togglePanel()">إظهار الإعدادات</button>
+  <button class="show-panel-btn" id="showBtn" onclick="togglePanel()">⚙️ الإعدادات</button>
 
   <div class="panel" id="panel">
-    <h2>إعدادات شاشة القفل</h2>
+    <h2>LockScreen Studio Pro</h2>
     
+    <label>السيناريوهات الجاهزة (Presets):</label>
+    <select id="presetSelect" onchange="applyPreset(this.value)">
+      <option value="">-- اختر سيناريو جاهز --</option>
+      <option value="religious">🕌 سيناريو ديني (أذكار وتذكير)</option>
+      <option value="motivation">💪 سيناريو تحفيزي (نجاح وتطوير)</option>
+      <option value="whatsapp">💬 محاكاة واتساب (واقعي)</option>
+    </select>
+
     <label>رابط الخلفية:</label>
-    <input type="text" id="bgUrl" placeholder="https://..." oninput="updateBg(this.value)">
+    <input type="text" id="bgUrl" placeholder="ضع رابط الصورة هنا..." oninput="updateBg(this.value)">
     
     <label>الإشعارات (كل سطر إشعار):</label>
-    <textarea id="notifList" rows="5" placeholder="اكتب هنا..."></textarea>
+    <textarea id="notifList" rows="5" placeholder="اكتب الإشعارات هنا..."></textarea>
     
-    <label>الفاصل الزمني (ثواني):</label>
-    <input type="number" id="gap" value="3">
+    <div style="display:flex; gap:10px">
+      <div style="flex:1">
+        <label>الفاصل (ث):</label>
+        <input type="number" id="gap" value="3" min="1">
+      </div>
+      <div style="flex:1">
+        <label>التباين الذكي:</label>
+        <select id="autoContrast" onchange="toggleAutoContrast(this.value)">
+          <option value="on">تشغيل</option>
+          <option value="off">إيقاف</option>
+        </select>
+      </div>
+    </div>
 
-    <button onclick="startSequence()">▶ بدء العرض</button>
-    <button style="background:#555" onclick="togglePanel()">🎥 وضع التصوير</button>
-    <button style="background:#ff3b30" onclick="clearAll()">🧹 مسح الكل</button>
+    <button onclick="startSequence()">▶ بدء العرض التلقائي</button>
+    <button class="btn-secondary" onclick="togglePanel()">🎥 وضع التصوير (إخفاء)</button>
+    <button class="btn-danger" onclick="clearAll()">🧹 مسح الكل</button>
   </div>
 
   <script>
+    const presets = {
+      religious: "سبحان الله وبحمده\nأستغفر الله العظيم وأتوب إليه\nاللهم صلِ وسلم على نبينا محمد\nلا حول ولا قوة إلا بالله",
+      motivation: "النجاح يبدأ بخطوة واحدة\nكن أنت التغيير الذي تريده\nلا تتوقف حتى تفتخر بنفسك\nوقتك هو أغلى ما تملك",
+      whatsapp: "السلام عليكم، كيف حالك؟\nهل انتهيت من العمل؟\nننتظرك على العشاء اليوم\nلا تنسى إحضار الطلبات معك"
+    };
+
+    function applyPreset(val) {
+      if(val && presets[val]) {
+        document.getElementById('notifList').value = presets[val];
+      }
+    }
+
     function updateClock() {
       const now = new Date();
       const h = String(now.getHours() % 12 || 12).padStart(2, '0');
@@ -285,13 +241,7 @@
       const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
       const months = ['يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
       
-      const dayName = days[now.getDay()];
-      const dayNum = now.getDate();
-      const monthName = months[now.getMonth()];
-      
-      document.getElementById('date').textContent = `${dayName} ,${dayNum} ${monthName}`;
-
-      // Simple Hijri (Approximate for UI)
+      document.getElementById('date').textContent = `${days[now.getDay()]} ,${now.getDate()} ${months[now.getMonth()]}`;
       const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {day:'numeric', month:'long', year:'numeric'}).format(now);
       document.getElementById('hijri').textContent = hijri.replace('هـ', '').trim();
     }
@@ -299,7 +249,31 @@
     updateClock();
 
     function updateBg(url) {
-      if(url) document.getElementById('bgImage').style.backgroundImage = `url('${url}')`;
+      if(!url) return;
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.src = url;
+      img.onload = function() {
+        document.getElementById('bgImage').style.backgroundImage = `url('${url}')`;
+        if(document.getElementById('autoContrast').value === 'on') {
+          analyzeContrast(img);
+        }
+      };
+    }
+
+    function analyzeContrast(img) {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 1; canvas.height = 1;
+      ctx.drawImage(img, 0, 0, 1, 1);
+      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      
+      const mainColor = brightness > 180 ? '#000000' : '#ffffff';
+      const shadow = brightness > 180 ? '0px 2px 10px rgba(255,255,255,0.3)' : '0px 2px 15px rgba(0,0,0,0.5)';
+      
+      document.documentElement.style.setProperty('--mainColor', mainColor);
+      document.documentElement.style.setProperty('--textShadow', shadow);
     }
 
     function addNotification(text) {
@@ -311,7 +285,6 @@
       const h = now.getHours() % 12 || 12;
       const m = String(now.getMinutes()).padStart(2, '0');
       const ampm = now.getHours() >= 12 ? 'م' : 'ص';
-      const timeStr = `${h}:${m} ${ampm}`;
 
       box.innerHTML = `
         <div class="notif-top">
@@ -323,7 +296,7 @@
             </svg>
           </div>
           <div class="notif-left">
-            <span class="notif-time">${timeStr}</span>
+            <span class="notif-time">${h}:${m} ${ampm}</span>
             <div class="notif-more">...</div>
           </div>
         </div>
@@ -360,11 +333,10 @@
 
     function clearAll() {
       document.getElementById('notificationsArea').innerHTML = '';
-      document.getElementById('notifList').value = '';
       if(timer) clearInterval(timer);
     }
 
-    // Default Background
+    // Initial Setup
     updateBg("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1080&q=80");
   </script>
 </body>
